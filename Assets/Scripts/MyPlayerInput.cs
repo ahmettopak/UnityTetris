@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,11 +7,14 @@ public class MyPlayerInput : MonoBehaviour
 	public bool IsPressLeft => Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
 	public bool IsPressRight => Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
 	public bool IsPressUp => Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
+    public bool IsPressDown => Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow);
 
-	private void Update()
+
+    private void Update()
 	{
 		if (IsPressLeft || IsPressRight)
 		{
+			//Horizontal
 			var value = IsPressLeft ? -1 : 1;
 			var isMovable = GameManager.Instance.IsInside(GetPreviewHorizontalPosition(value));
 			if (isMovable)
@@ -23,7 +27,16 @@ public class MyPlayerInput : MonoBehaviour
 			if(isRotatable)
 				Rotate();
 		}
-	}
+        else if (IsPressDown) {
+            //Down
+            var isMovable = GameManager.Instance.IsInside(GetPreviewPosition());
+            if (isMovable)
+                MoveVertical(-1);
+			else {
+				Debug.Log("Daha inmez");
+			}
+        }
+    }
 
 	private List<Vector2> GetPreviewPosition()
 	{
@@ -65,11 +78,18 @@ public class MyPlayerInput : MonoBehaviour
 		current.position = position;
 	}
 
-	private void Rotate()
+
+    private void Rotate()
 	{
 		var current = GameManager.Instance.Current.transform;
 		var angles = current.eulerAngles;
 		angles.z += -90;
 		current.eulerAngles = angles;
 	}
+    private void MoveVertical(int value) {
+        var current = GameManager.Instance.Current.transform;
+        var position = current.position;
+        position.y += value;
+        current.position = position;
+    }
 }
